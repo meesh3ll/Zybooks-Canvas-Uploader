@@ -6,7 +6,7 @@ import os
 import pyfiglet
 import json
 import pandas as pd
-from Publisher.utils.canvas_api import (
+from utils.canvas_api import (
     get_students, get_assignments, find_assignment,
     update_grade, update_tokens, get_user_profile
 )
@@ -30,8 +30,8 @@ def display_intro():
     sep = u'─' * 100
     print("Canvas Grade Publisher")
     print("Updates grades using:")
-    print(" • Downloaded grades CSV (prefix 'CSE30SP25') for on-time and late grades")
-    print(" • Canvas gradebook export CSV (prefix '2025-') for current token counts")
+    print(" • Downloaded grades CSV (prefix 'CSE30W26') for on-time and late grades")
+    print(" • Canvas gradebook export CSV (prefix '2026-') for current token counts")
     print(sep)
 
 # ---------------------------
@@ -63,6 +63,7 @@ def detect_csv_by_prefix(prefix):
 def parse_downloaded_grades(path):
     df = pd.read_csv(path)
     required = ['First Name', 'Last Name', 'Email', 'Grade', 'Late Grade']
+    # required = ['First Name', 'Last Name', 'Email', 'Grade']
     for col in required:
         if col not in df.columns:
             raise ValueError(f"Missing '{col}' in downloaded grades CSV")
@@ -143,16 +144,18 @@ def main():
     assignment_name      = config.get('assignment_name')
     tokens_assignment_id = config.get('tokens_assignment_id')
     if not all([access_token, course_id, assignment_name, tokens_assignment_id]):
+    # if not all([access_token, course_id, assignment_name]):
         print("Error: 'access_token', 'course_id', 'assignment_name', and 'tokens_assignment_id' must be set in config.json")
         sys.exit(1)
 
-    dl_csv = detect_csv_by_prefix('CSE30SP25')
-    gb_csv = detect_csv_by_prefix('2025-')
+    dl_csv = detect_csv_by_prefix('CSE30W26')
+    gb_csv = detect_csv_by_prefix('2026-')
     print(f"Downloaded grades: {dl_csv}\nGradebook export: {gb_csv}")
 
     name_map, email_map = parse_downloaded_grades(dl_csv)
     tokens_map = parse_gradebook_tokens(gb_csv)
     print(f"Parsed {len(name_map)} downloaded grades and {len(tokens_map)} token counts.")
+    # print(f"Parsed {len(name_map)} downloaded grades")
 
     headers  = {'Content-Type': 'application/json', 'Authorization': f'Bearer {access_token}'}
     endpoint = 'https://canvas.ucsc.edu/api/v1'
@@ -182,6 +185,7 @@ def main():
             entry = name_map.get((first, last))
 
         tokens = tokens_map.get(email, 0)
+        # tokens = 0
         print(f"Tokens for {student['sortable_name']}: {tokens}")
         grade  = compute_final_grade(entry, tokens) if entry else None
         source = 'downloaded'
