@@ -1,7 +1,13 @@
-# Notebook to Canvas Grader
+# NotebookGrader to Canvas Grader
 
 This program is designed to help instructors grade assignments from NotebookGrader and publish the grades to Canvas. The tool
 processes a CSV file containing student grades and publishes them to the Canvas gradebook.
+
+## Table of Contents
+
+* [Requirements](#requirements)
+* [Usage](#usage)
+* [Main Program](#main-program-canvas-publisher)
 
 ## Requirements
 
